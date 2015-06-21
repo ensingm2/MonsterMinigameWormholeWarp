@@ -326,9 +326,6 @@ function firstRun() {
 	addIRC();
 	addExtraUI();
 
-	//Enable Pointer
-	var value = enableFingering;
-
 	window.CSceneGame.prototype.ClearNewPlayer = function(){};
 
 	if(!getScene().m_spriteFinger) {
@@ -337,20 +334,17 @@ function firstRun() {
 		window.WebStorage.SetLocal('mg_how2click', 1);
 	}
 
-	if(value) {
+	if(enableFingering) {
 		getScene().m_containerParticles.addChild(getScene().m_spriteFinger);
 	} else {
 		getScene().m_containerParticles.removeChild(getScene().m_spriteFinger);
 	}
 	document.getElementById('newplayer').style.display = 'none';
 	
-	updateToggle("pointer", enableFingering);
-	
-	
 	//Initial disable of renderer
 	var ticker = window.PIXI.ticker.shared;
 
-	if (!value) {
+	if (!disableRenderer) {
 		ticker.autoStart = true;
 		ticker.start();
 
@@ -362,7 +356,6 @@ function firstRun() {
 
 		window.g_Minigame.Render = function() {};
 	}
-	updateToggle("limitFPS", disableRenderer);
 	
 	isPastFirstRun = true;
 	
@@ -516,6 +509,13 @@ function addExtraUI() {
 	updateToggle("interface", !removeInterface);
 	updateToggle("particle", !removeParticles);
 	updateToggle("flinching", !removeFlinching);
+	updateToggle("critText", !removeCritText);
+	updateToggle("allText", !removeAllText);
+	updateToggle("pointer", enableFingering);
+	updateToggle("limitFPS", disableRenderer);
+	updateToggle("trollTracker", enableTrollTrack);
+	updateToggle("elementLock", enableElementLock);
+	updateToggle("chen", enableChen);
 
 	// Slide the settings panel out on click
 	$J("#settings").click(function() {
@@ -642,13 +642,13 @@ function toggleInterface() {
 function toggleParticles() {
 	removeParticles = !removeParticles;
 	setPreference("removeParticles", removeParticles);
-	updateToggle("particle", removeParticles);
+	updateToggle("particle", !removeParticles);
 }
 
 function toggleFlinching() {
 	removeFlinching = !removeFlinching;
 	setPreference("removeFlinching", removeFlinching);
-	updateToggle("flinching", removeFlinching);
+	updateToggle("flinching", !removeFlinching);
 }
 
 function updateToggle(id, enabled) {
@@ -1503,6 +1503,7 @@ function toggleFingering() {
 	}
 	document.getElementById('newplayer').style.display = 'none';
 	
+	setPreference("enableFingering", enableFingering);
 	updateToggle("pointer", enableFingering);
 }
 
@@ -1533,6 +1534,7 @@ function toggleRenderer() {
 
 		window.g_Minigame.Render = function() {};
 	}
+	setPreference("disableRenderer", disableRenderer);
 	updateToggle("limitFPS", disableRenderer);
 }
 
@@ -1546,6 +1548,7 @@ function toggleChen(event) {
 		window.$J('.tv_ui').css('background-image', oldTvBg);
 	}
 
+	setPreference("enableChen", enableChen);
 	updateToggle("chen", enableChen);
 }
 
@@ -1577,6 +1580,7 @@ function toggleElementLock() {
 		unlockElements();
 	}
 	
+	setPreference("enableElementLock", enableElementLock);
 	updateToggle("elementLock", enableElementLock);
 }
 
@@ -1590,7 +1594,8 @@ function toggleCritText() {
 		getScene().DoCritEffect = trt_oldCrit;
 	}
 	
-	updateToggle("critText", value);
+	setPreference("removeCritText", value);
+	updateToggle("critText", !value);
 }
 
 function toggleAllText(event) {
@@ -1611,12 +1616,14 @@ function toggleAllText(event) {
 		CUI.prototype.UpdateLog = originalUpdateLog;
 	}
 	
-	updateToggle("allText", value);
+	setPreference("removeAllText", value);
+	updateToggle("allText", !value);
 }
 
 function toggleTrackTroll() {
 	var value = enableTrollTrack = !enableTrollTrack;
 	
+	setPreference("enableTrollTrack", value);
 	updateToggle("trollTracker", value);
 }
 
